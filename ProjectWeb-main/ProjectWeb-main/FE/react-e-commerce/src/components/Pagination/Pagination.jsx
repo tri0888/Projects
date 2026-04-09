@@ -1,6 +1,9 @@
 import React from "react";
-import ReactPaginate from "react-paginate";
+import ReactPaginateImport from "react-paginate";
 // import "./Pagination.css";
+
+const ReactPaginate = ReactPaginateImport?.default || ReactPaginateImport;
+
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   return (
     <ReactPaginate

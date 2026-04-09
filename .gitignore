@@ -1,7 +1,11 @@
 target/
 *.jar
-ProjectWeb-BE/discovery-service.pdf
-ProjectWeb-BE/gateway-service.pdf
-ProjectWeb-BE/notification-service.pdf
-ProjectWeb-BE/Order-Service.pdf
-ProjectWeb-BE/Product-service.pdf
+*.class
+*.log
+*.class
+
+ProjectWeb-BE/ProjectWeb-BE/doc/discovery-service.pdf
+ProjectWeb-BE/ProjectWeb-BE/doc/gateway-service.pdf
+ProjectWeb-BE/ProjectWeb-BE/doc/notification-service.pdf
+ProjectWeb-BE/ProjectWeb-BE/doc/Order-Service.pdf
+ProjectWeb-BE/ProjectWeb-BE/doc/Product-service.pdf

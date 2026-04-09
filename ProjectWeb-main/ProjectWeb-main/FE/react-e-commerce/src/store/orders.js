@@ -10,6 +10,7 @@ const initialState = {
 const actions = Object.freeze({
   GET_ORDERS: "GET_ORDERS",
   GET_ORDER_TO_BE_CANCELED: "GET_ORDER_TO_BE_CANCELED",
+  UPDATE_ORDER_STATUS: "UPDATE_ORDER_STATUS",
 });
 
 const reducer = (state, action) => {
@@ -20,6 +21,19 @@ const reducer = (state, action) => {
   if (action.type == actions.GET_ORDER_TO_BE_CANCELED) {
     return { ...state, order_to_be_canceled: action.order_id };
   }
+
+  if (action.type == actions.UPDATE_ORDER_STATUS) {
+    return {
+      ...state,
+      orders: state.orders.map((order) =>
+        order.id === action.payload.order_id
+          ? { ...order, status: action.payload.status }
+          : order
+      ),
+      order_to_be_canceled: null,
+    };
+  }
+
   return state;
 };
 
@@ -79,11 +93,11 @@ const useOrders = () => {
     // dispatch({ type: actions.GET_ORDER_TO_BE_CANCELED, order_id: null });
     // getOrders(data.user_id);
       dispatch({
-          type: actions.UPDATE_ORDER_STATUS,
-          payload: {
-              order_id: data.order_id,
-              status: data.status,
-          },
+        type: actions.UPDATE_ORDER_STATUS,
+        payload: {
+          order_id: data.id,
+          status: data.status,
+        },
       });
     return data;
   };

@@ -56,7 +56,7 @@ const Products = () => {
           <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          handlePageClick={handlePageClick}
+          onPageChange={handlePageClick}
           />
         </div>
       </>

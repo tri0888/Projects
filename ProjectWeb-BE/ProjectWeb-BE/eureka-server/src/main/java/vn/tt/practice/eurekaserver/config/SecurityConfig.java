@@ -14,6 +14,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/eureka/**").permitAll()
+                        .requestMatchers("/eureka/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults()) // login bằng Basic Auth

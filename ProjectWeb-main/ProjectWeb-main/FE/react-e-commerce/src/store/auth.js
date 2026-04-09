@@ -26,36 +26,38 @@ const reducer = (state, action) => {
 const useAuth = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const safeJson = async (response) => {
+    try {
+      return await response.json();
+    } catch {
+      return {};
+    }
+  };
+
   const register = async (userInfo) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/user/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
         },
         mode: "cors",
         credentials: "include",
         body: JSON.stringify(userInfo),
       });
 
-      const user = await response.json();
-      console.log(user)
-
-      if (user.error) {
-
-        toast.error(user.error);
+      const payload = await safeJson(response);
+      if (!response.ok) {
+        toast.error(payload.error || payload.message || "Registration failed");
+        return false;
       }
-      // if (user.user) {
-      //   dispatch({ type: actions.SET_USER, user: user.user });
-      //   user.user.expirationDate = setExpirationDate(7);
-      //   localStorage.setItem("user", JSON.stringify(user.user));
-        toast.success("Registration successful");
-      //   // login user
-      // }
+
+      toast.success("Registration successful");
+      return true;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("There was a problem registering, try again");
+      return false;
     }
   };
 
@@ -70,22 +72,30 @@ const useAuth = () => {
         credentials: "include",
         body: JSON.stringify(userInfo),
       });
-      const user = await response.json();
-      if (user.user.error) {
-        console.log(user.user.error)
-        toast.error(user.user.error);
+
+      const payload = await safeJson(response);
+      if (!response.ok) {
+        toast.error(payload.error || payload.message || "Login failed");
+        return false;
       }
-      console.log(user)
-      if (user) {
-        dispatch({ type: actions.SET_USER, user: user.user });
-        user.user.expirationDate = setExpirationDate(7);
-        localStorage.setItem("user", JSON.stringify(user.user));
-        localStorage.setItem("token", user.token.toString());
-        toast.success("Login successful");
+
+      const user = payload.user;
+      const token = payload.token;
+      if (!user || !token) {
+        toast.error("Unexpected login response from server");
+        return false;
       }
+
+      dispatch({ type: actions.SET_USER, user });
+      user.expirationDate = setExpirationDate(7);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token.toString());
+      toast.success("Login successful");
+      return true;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("There was a problem logging in, try again");
+      return false;
     }
   };
   // const login = async (userInfo) => {

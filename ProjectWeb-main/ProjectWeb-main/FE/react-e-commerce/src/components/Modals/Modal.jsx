@@ -35,9 +35,10 @@ const Modal = ({ header, submitAction, buttonText, isRegister }) => {
     if (isRegister) {
       auth
         .register(data)
-        .then(() => {
-          // close modal
-          modal.closeModal();
+        .then((ok) => {
+          if (ok) {
+            modal.closeModal();
+          }
         })
         .finally(() => {
           setLoading(false);
@@ -45,8 +46,10 @@ const Modal = ({ header, submitAction, buttonText, isRegister }) => {
     } else {
       auth
         .login(data)
-        .then(() => {
-          modal.closeModal();
+        .then((ok) => {
+          if (ok) {
+            modal.closeModal();
+          }
         })
         .finally(() => {
           setLoading(false);
