@@ -17,7 +17,7 @@ services:
     image: mongo
     restart: always
     ports:
-      - "27017:27017"
+      - "27018:27017"
     networks:
       - app-network
 
@@ -39,7 +39,7 @@ services:
       - app-network
   #Kafka
   kafka-1:
-    image: bitnami/kafka:latest
+    image: bitnamilegacy/kafka:latest
     ports:
       - "9092:9092"
     environment:
@@ -48,18 +48,18 @@ services:
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9091,2@kafka-2:9091,3@kafka-3:9091
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9090,EXTERNAL://${HOSTNAME:-localhost}:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9090,EXTERNAL://kafka-1:9092
 #      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9090,EXTERNAL://kafka-1:9092
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     volumes:
-      - F:/Docker/Kafka/kafka-data/volume1:/bitnami/kafka
+      - kafka1_data:/bitnami/kafka
     networks:
       - app-network
 
   kafka-2:
-    image: bitnami/kafka:latest
+    image: bitnamilegacy/kafka:latest
     ports:
     - "9094:9094"
     environment:
@@ -68,18 +68,18 @@ services:
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9091,2@kafka-2:9091,3@kafka-3:9091
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9090,EXTERNAL://${HOSTNAME:-localhost}:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9090,EXTERNAL://kafka-2:9094
 #      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9090,EXTERNAL://kafka-2:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     volumes:
-      - F:/Docker/Kafka/kafka-data/volume2:/bitnami/kafka
+      - kafka2_data:/bitnami/kafka
     networks:
       - app-network
 
   kafka-3:
-    image: bitnami/kafka:latest
+    image: bitnamilegacy/kafka:latest
     ports:
       - "9096:9096"
     environment:
@@ -88,20 +88,20 @@ services:
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9091,2@kafka-2:9091,3@kafka-3:9091
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9096
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9090,EXTERNAL://${HOSTNAME:-localhost}:9096
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9090,EXTERNAL://kafka-3:9096
 #      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9090,EXTERNAL://kafka-3:9096
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     volumes:
-      - F:/Docker/Kafka/kafka-data/volume3:/bitnami/kafka
+      - kafka3_data:/bitnami/kafka
     networks:
       - app-network
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "8080:8080"
+      - "8088:8080"
     environment:
       - KAFKA_CLUSTERS_0_NAME=kafka-cluster
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:9090,kafka-2:9090,kafka-3:9090
@@ -112,6 +112,7 @@ services:
 #Eureka-Server
   eureka-server:
     image: eureka-server
+    build: ./eureka-server
     container_name: eureka-server
     ports:
       - "8761:8761"
@@ -121,6 +122,9 @@ services:
       - EUREKA_INSTANCE_HOSTNAME=eureka-server
       - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
       - EUREKA_CLIENT_FETCH_REGISTRY=false
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
 
 #User-service
   user-service:
@@ -137,9 +141,11 @@ services:
       - eureka-server
       - zipkin
     environment:
-      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - EUREKA_SERVER_URL=http://admin:password@eureka-server:8761/eureka/
       - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
 
 #Product-service
   product-service:
@@ -162,7 +168,7 @@ services:
     environment:
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
-      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - EUREKA_SERVER_URL=http://admin:password@eureka-server:8761/eureka/
       - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
       - KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9094,kafka-3:9096
@@ -188,7 +194,7 @@ services:
     environment:
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
-      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - EUREKA_SERVER_URL=http://admin:password@eureka-server:8761/eureka/
       - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
       - KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9094,kafka-3:9096
@@ -208,6 +214,11 @@ services:
       - kafka-ui
     environment:
       - KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9094,kafka-3:9096
+      - EUREKA_SERVER_URL=http://admin:password@eureka-server:8761/eureka/
+      - USER_SERVICE_URL=http://user-service:8081
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
 
 #Payment-service
   payment-service:
@@ -218,6 +229,11 @@ services:
       - "8085:8085"
     networks:
       - app-network
+    environment:
+      - EUREKA_SERVER_URL=http://admin:password@eureka-server:8761/eureka/
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
 
 #Api-gateway
   api-gateway:
@@ -225,13 +241,16 @@ services:
     build: ./api-gateway
     container_name: api-gateway
     ports:
-      - "8181:8181"
+      - "8080:8181"
     depends_on:
       - eureka-server
     environment:
       - FRONTEND_ALLOWED_ORIGINS=http://localhost:5173,http://frontend:5173
-      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - EUREKA_SERVER_URL=http://admin:password@eureka-server:8761/eureka/
       - FRONTEND_ALLOWED_ORIGINS=http://localhost:5173,http://frontend:5173
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
 
     networks:
       - app-network
@@ -242,4 +261,10 @@ networks:
 
 volumes:
   cache:
+    driver: local
+  kafka1_data:
+    driver: local
+  kafka2_data:
+    driver: local
+  kafka3_data:
     driver: local

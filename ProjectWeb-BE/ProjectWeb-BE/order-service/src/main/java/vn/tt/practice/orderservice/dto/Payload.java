@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import vn.tt.practice.orderservice.model.Order;
-import vn.tt.practice.productservice.dto.ProductDTO;
 
 import java.util.List;
 

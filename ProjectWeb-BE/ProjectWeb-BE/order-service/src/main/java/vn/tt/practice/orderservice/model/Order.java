@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import vn.tt.practice.productservice.dto.ProductDTO;
+import vn.tt.practice.orderservice.dto.ProductDTO;
 
 import java.util.List;
 

@@ -1,5 +1,5 @@
 # Chọn image base (sử dụng JDK image)
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre
 
 # Thiết lập thư mục làm việc trong container
 WORKDIR /app

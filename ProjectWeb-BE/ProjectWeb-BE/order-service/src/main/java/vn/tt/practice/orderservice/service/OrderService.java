@@ -13,7 +13,7 @@ import vn.tt.practice.orderservice.mapper.OrderMapper;
 import vn.tt.practice.orderservice.model.Order;
 import vn.tt.practice.orderservice.producer.OrderEventProducer;
 import vn.tt.practice.orderservice.repository.OrderRepo;
-import vn.tt.practice.productservice.dto.ProductDTO;
+import vn.tt.practice.orderservice.dto.ProductDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;

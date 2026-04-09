@@ -25,7 +25,7 @@ import java.util.Optional;
 @Controller
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/api/user")
+@RequestMapping({"/v1/api/user", "/api/user"})
 //@CrossOrigin(origins = "*")
 @Slf4j
 public class UserController {

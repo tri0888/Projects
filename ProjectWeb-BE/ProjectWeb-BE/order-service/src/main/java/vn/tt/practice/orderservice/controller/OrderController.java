@@ -16,11 +16,16 @@ import vn.tt.practice.orderservice.service.OrderService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/api/order")
+@RequestMapping({"/v1/api/order", "/api/order"})
 @RequiredArgsConstructor
 public class OrderController {
 
     private final OrderService orderService;
+
+    @GetMapping({"", "/"})
+    public ResponseEntity<String> orderApiRoot() {
+        return ResponseEntity.ok("Order API is running");
+    }
 
     @PostMapping("/place-order")
     public ResponseEntity<Payload> placeOrder(@RequestBody Payload request) {

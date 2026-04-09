@@ -19,8 +19,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
-@RequestMapping("/v1/api/payment")
+@RequestMapping({"/v1/api/payment", "/api/payment"})
 public class PaymentController {
+
+    @GetMapping({"", "/"})
+    public ResponseEntity<String> paymentApiRoot() {
+        return ResponseEntity.ok("Payment API is running");
+    }
 
     @GetMapping("/create-payment")
     public ResponseEntity<?> createPayment(
